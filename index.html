@@ -4,7 +4,7 @@
     <title>Writing R Packages</title>
     <meta charset="utf-8" />
     <meta name="author" content="Manuel Alcala Kovalski" />
-    <meta name="date" content="2021-10-12" />
+    <meta name="date" content="2021-10-13" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
     <link rel="stylesheet" href="my-theme.css" type="text/css" />
@@ -15,7 +15,7 @@ class: center, middle, inverse, title-slide
 
 # Writing R Packages
 ### Manuel Alcala Kovalski
-### 2021-10-12
+### 2021-10-13
 
 ---
 
@@ -26,14 +26,25 @@ class: center, middle, inverse, title-slide
 
 # Overview
 
-- What is an R package and why you might want to build one
-- Functions
-- Basic package structures and concepts
-- Documentation
-- Dependencies
-- Build and check
++ What is an R package and why you might want to build one
 
++ Functions
+
++ Basic package structures and concepts
+    
++ Documentation
+    
++ Dependencies
+    
++ Build and check
+    
 --
+
++ Extras:
+    
+    + `ggbrookings` walkthrough
+    
+    
 
 Writing a package can seem overwhelming at first. So we'll cover the basics to get you started
 
@@ -96,10 +107,10 @@ these should be notes
 
 # Setup
 
-Hadley Wickham has provided the R community with devtools which helps with building R packages. We will be using this package to make our lives easier:
+Hadley Wickham and Jenny Bryan has provided the R community with `devtools` and `usethis` which helps with building R packages. We will be using this package to make our lives easier:
 
 ```r
-install.packages("devtools")
+install.packages(c("devtools", "usethis", "roxygen2"))
 ```
 
 -- 
@@ -266,7 +277,12 @@ usethis::use_r()
 ```
 
 + Creates a new code file for you to write your function.
+
+--
+
 + Places file in the `R` folder
+--
+
 + New file is entirely blank
 
 --
