@@ -4,10 +4,11 @@
     <title>Writing R Packages</title>
     <meta charset="utf-8" />
     <meta name="author" content="Manuel Alcala Kovalski" />
-    <meta name="date" content="2021-10-15" />
+    <meta name="date" content="2021-10-19" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="remark.css" type="text/css" />
     <link rel="stylesheet" href="my-theme.css" type="text/css" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
@@ -15,7 +16,7 @@ class: center, middle, inverse, title-slide
 
 # Writing R Packages
 ### Manuel Alcala Kovalski
-### 2021-10-15
+### 2021-10-19
 
 ---
 
@@ -24,41 +25,50 @@ class: center, middle, inverse, title-slide
 
 
 
-# Overview
 
-    
-    
+
+
+
+&lt;style type="text/css"&gt;
+.highlight-last-item &gt; ul &gt; li, 
+.highlight-last-item &gt; ol &gt; li {
+  opacity: 0.5;
+}
+.highlight-last-item &gt; ul &gt; li:last-of-type,
+.highlight-last-item &gt; ol &gt; li:last-of-type {
+  opacity: 1;
+}
+&lt;/style&gt;
+
+## Overview
 
 Writing a package can seem overwhelming at first. So we'll cover the basics to get you started:
 
 --
-
 + What is an R package and why you might want to build one
 
 --
 + Functions
 
 --
-
 + Basic package structures and concepts
 
 --
 + Documentation
 
 --
-
 + Dependencies
 
 --
-
 + Build and check
 
 --
 + `ggbrookings` walkthrough
 
 ---
+class: highlight-last-item
 
-# R packages 
+## R packages 
 In R, the fundamental unit of shareable code is the package. 
 
 + What are they?
@@ -69,7 +79,7 @@ In R, the fundamental unit of shareable code is the package.
 
 
 
-Most likely, you already know how to
+You may already know how to:
 
 - Install them from CRAN
 
@@ -95,16 +105,13 @@ help(package = "x")
 
 ---
 
-# Why write a package?
+## Why write a package?
 
 + Code Organization: 
   + I am always trying to figure out where that “function” I wrote months, weeks, or even days ago. Often times, I end up just re-writing it because it is faster than searching all my .R files. An R package would help in organizing where my functions go.
-
-
 + Consistent documentation: 
   + I can barely remember what half of my functions do let alone the inputs and outputs. 
   + An R package provides a great consistent documentation structure and actually encourages you to document your functions.
-
 + Code Distribution: 
   + No more emailing .R scripts! 
   + An R package gives an easy way to distribute your code for others. Especially if you put it on GitHub.
@@ -113,7 +120,7 @@ help(package = "x")
 these should be notes
 ---
 
-# Setup
+## Setup
 
  We will be using these packages to make our lives easier:
 
@@ -126,7 +133,7 @@ install.packages(c("devtools", # expedite common tasks to simplify package dev
 
 
 ---
-# Lets build a package! 
+## Lets build a package! 
 
 .xlarge[.pull-left[
 You can setup a bare bones package by running:
@@ -140,24 +147,31 @@ usethis::create_package("mypkg")
 .pull-right[
 &lt;img src="images/basic-pkg-structure.png"&gt;
 ]
---
-
 
 ---
 
-# Package Structure: Requirements
+## Lets build a package! 
 
 .xlarge[.pull-left[
-+ **_Description:_** 
+Or clicking __File &gt; New Project... &gt; New Directory &gt; R package__
 ]]
 
 .pull-right[
+&lt;img src="images/new-pkg.png"&gt;
+]
 
-####A file with metadata about the package, authors, and dependencies.
+---
 
+## Package Structure: Requirements
 
+.xlarge[.left-column[
++ **_Description_** 
+]]
+
+.right-column[
+&lt;br&gt;
+A file with metadata about the package, authors, and dependencies.
 ```
-
 Package: mypkg
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
@@ -176,21 +190,20 @@ RoxygenNote: 7.1.2
 ```
 ]
 
----
-# Package Structure: Requirements
 
-.xlarge[.pull-left[
-+ __Description__&lt;br&gt;&lt;br&gt;
+---
+## Package Structure: Requirements
+
+.xlarge[.left-column[
++ Description
 + **_NAMESPACE_** 
 ]]
 
-.pull-right[
+.right-column[
+&lt;br&gt;&lt;br&gt;&lt;br&gt;
 + A short-hand file so R can understand what functions and dependencies to import.
-
 + Lists functions that will be exported by your package
-
 + Lists functions imported from other packages
-
 + `{roxygen2}` will take care of this for you!
 
 
@@ -205,63 +218,25 @@ importFrom(magrittr,"%&gt;%")
 ```
 ]
 ---
-# Package Structure: Requirements
+## Package Structure: Requirements
 
-.xlarge[.pull-left[
-+ __Description__ &lt;br&gt;&lt;br&gt;
-+ __NAMESPACE__ &lt;br&gt;&lt;br&gt;
-+ _**R code folder**_
+.xlarge[.left-column[
++ Description
++ NAMESPACE
++ _**R folder**_
 ]]
 
-.pull-right[
+.right-column[
+&lt;br&gt;
 + Your functions go here!
-
 + Often you'll see one code file for each exported function.
-
 + You can include more than one function in your .R file.
-
 + I recommend keeping related functions together.
   
 ]
 ---
 
-# Package structure: Optional
-.xlarge[.pull-left[
-+ _**Help files**_ 
-]]
-
-.pull-right[
-+ Documentation for your functions.
-
-+ Written in a syntax similar to LaTex
-
-+ More common to generate them using the package documentation tool `{roxygen2}`.
-]
-
----
-
-# Package structure: Optional
-.xlarge[.pull-left[
-+ __Help files__&lt;br&gt;&lt;br&gt; 
-+ _**Vignettes**_ 
-]]
-
-.pull-right[
-+ Worked examples of how to use your functions. 
-
-+ Usually writen in `Rmarkdown`. 
-
-+ Create them with
-
-```r
-usethis::use_vignette("my_vignette")
-```
-
-]
-
----
-
-# Dependencies 
+## Dependencies 
 
 Usually your package will depend on other packages. You need to convey this so that they are installed. 
 --
@@ -272,86 +247,74 @@ Usually your package will depend on other packages. You need to convey this so t
   
 --
 
-For further reading, I suggest Jim Hester's post: https://www.tidyverse.org/blog/2019/05/itdepends/
---
-
 
 __Beware of tidyverse dependencies!__  Hadley's Wickham's advice:  
-
 &gt;Because the tidyverse is a set of packages designed for interactive data analysis, this is, in short, a bad idea. The tidyverse package includes a substantial number of direct and indirect dependencies (79 packages, as of this writing), many of which are likely unnecessary for the purposes of your package. Furthermore, the CRAN maintainers frown upon depending on it, which can cause hassle for you down the line.
 ---
-# Functions
 
+## Functions
 
-```r
-usethis::use_r()
-```
-
-+ Creates a new code file for you to write your function.
-
---
-
-+ Places file in the `R` folder
---
-
-+ New file is entirely blank
-
---
-
-For example, 
+.pull-left[
+Lets create a wrapper function around `mean` which ommits NA's by default.
 
 ```r
 usethis::use_r("my_mean")
 ```
+]
 
---
-
-__Note:__ You can include more than one function in your .R file, I recommend keeping related functions together.
-
+.pull-right[
++ Creates a new code file for you to write your function.
++ Places file in the `R` folder
++ New file is entirely blank
+]
 
 ---
-# Functions
-Let's write our first function
+## Functions
 
+.pull-left[
+Lets create a wrapper function around `mean` which ommits NA's by default.
+
+```r
+usethis::use_r("my_mean")
+```
+&lt;br&gt;
+Write the body of our function:
 
 ```r
 my_mean &lt;- function(x) {
   mean(na.omit(x))
 }
 ```
+]
 
+.pull-right[
++ Creates a new code file for you to write your function.
++ Places file in the `R` folder
++ New file is entirely blank
+&lt;br&gt;&lt;br&gt;
+🛑 For *EVERY* __non-base__ R function you need to use `::` to reference the function. 
+]
 --
 
-+ For EVERY non-base R function you need to use `::` to reference the function. 
 
---
-
-+ Since `na.omit()` is from the `stats` package, our function should be written as
-
+.pull-left[
+Since `na.omit()` is from the `stats` package, our function should be written as
 
 ```r
 my_mean &lt;- function(x) {
-  mean(stats::na.omit(x))
+*  mean(stats::na.omit(x)) 
 }
 ```
-
---
-
+]
 
 
 ---
 
-# Functions
-
-Lets add another function that produces a __sorted__ frequency table for a factor. 
-
---
-
-We’ll do this by building on `forcats::fct_count()`.
+## Functions
+Lets add another function that produces a __sorted__ frequency table for a factor. We’ll do this by building on `forcats::fct_count()`.
 
 --
-
-+ First, add the forcats package to the "Imports" section of DESCRIPTION. 
++ First, add the `forcats` package to the __"Imports"__ section of **DESCRIPTION**. 
 
 
 ```r
@@ -366,7 +329,6 @@ usethis::use_r("fcount")
 ```
 
 --
-
 + Write the body of the function
 
 ```r
@@ -377,92 +339,78 @@ fcount &lt;- function(x) {
 
 --
 + The last step will be to use `{roxygen2}` comments in our code to document our new function.
----
-# Documentation
-
-- R function help files (*.Rd) are saved in the `man` (manual pages) folder created by `usethis::create_package()`
-
---
-+ The code in *.Rd is similar to LaTex which can be verbose and cumbersome.
-
---
-
-.pull-left[
-+ Fortunately, we can automate their creation with `{roxygen2}` comments. There's no need for you to learn how to write them yourself.
-
-]
-
-.pull-right[
-
-```r
-usethis::use_roxygen_md()
-```
-]
 
 ---
-# Documentation
+## Documentation
 
 The premise of `roxygen2` is to describe your functions in comments next to their definitions and `roxygen2` will process your source code and comments to create `.Rd` files in the `man/` directory
+
+--
 + Roxygen comments appear above a function
 
 --
 + They always start with `#'`
 
 --
-
-+ Most common tags are
++ Most common tags are:
   + `@param` documents function arguments
   + `@export` tells roxygen to export the function when the package is built
+--
+
+.pull-left[ Insert a roxygen2 skeleton by placing your cursor inside the function body and either: 
+  + Pressing `Ctrl + Alt + Shift + R`  
+  + Clicking `Code &gt; Insert roxygen skeleton`.]
+  
+.pull-right[
+  
+  ```r
+  #' Make a sorted frequency table for a factor
+  #'
+  #' @param x factor
+  #'
+  #' @return A tibble
+  #' @export
+  #' @examples
+  #' fcount(iris$Species)
+  fcount &lt;- function(x) {
+  forcats::fct_count(x, sort = TRUE)
+  }
+  ```
+]
 
 ---
-# Documentation
 
-+ Insert a roxygen2 skeleton by placing your cursor inside the function body and either 
-
---
-  + Pressing `Ctrl + Alt + Shift + R`  
-
---
-  + Clicking `Code &gt; Insert roxygen skeleton`. 
-
---
+## Documentation
 
 .pull-left[
-+ Now we can document our function:
+Now we can document our function:
 
 ```r
-#' Make a sorted frequency table for a factor
-#'
-#' @param x factor
-#'
-#' @return A tibble
-#' @export
-#' @examples
-#' fcount(iris$Species)
-fcount &lt;- function(x) {
-  forcats::fct_count(x, sort = TRUE)
-}
+devtools::document() # Ctrl + Shift + D
 ```
+
+And preview it with
+
+
+```r
+?fcount # or help('fcount')
+```
+
 ]
+
 .pull-right[
+
 &lt;img src="images/fcount-documentation.png"&gt;
 ]
-
 --
 
-+ Finally, we can convert our roxygen comment into `man/fcount.Rd` with `devtools::document()` or with `Ctrl + Shift + D`.
-
---
-
-+ You should now be able to preview your help file with
-
-```r
-?fcount
-```
++ This did a lot of work for us!
+  + The `man` folder (short for manual) now contains a file called `fcount.Rd`. 
+  + The `NAMESPACE` now specifies that the package will export the `fcount` function. 
 
 ---
 
-# Include Datasets
+## Include Datasets
 
 .pull-left[
 + Including datasets in an R package is easy with `use_data_raw()` and `use_data()`
@@ -481,7 +429,6 @@ usethis::use_data_raw()
 --
 .pull-right[
 - Simulate dataset, and `use_data()` will save it with the package
-
 - Save this script is the `data-raw/` folder
 
 
@@ -501,35 +448,49 @@ usethis::use_data(my_data, overwrite = TRUE)
 
 ---
 
-# How do we actually install and use our package?
+## How do we actually install and use our package?
 
 + How do we test drive `fcount()`? 
-
-+ If this were a regular R script, we might define fcount() in the global workspace by running it outrselves or calling `source("R/fcount.R")`.
+  + If this were a regular R script, we might define fcount() in the global workspace by running it outrselves or calling `source("R/fcount.R")`.
 
 --
-
 + `devtools::load_all()` to the rescue!
-
-  + Loads your R package into memory exposing the functions and data we created earlier. 
+  + Places your functions and package in local memory so that you may tinker and confirm its execution
 
 --
-
   + Basically the equivalent of sourcing all the scripts in your `R/` folder and loading all your data.
   
 --
-
   + Allows you to iterate quickly, which encourages exploration and incremental progress.
 
 --
-
 + However as soon as you close your R session, the package will no longer be available.
 
+.left-column[ Lets test our function!]
+
+
+.right-column[
+
+
+
+
+```r
+#devtools::load_all()
+fcount(iris$Species)
+```
+
+```
+#&gt; [90mtibble[39m [90m[3, 2][39m 
+#&gt; f [90mfct[39m [31msetosa[39m [33mversicolor[39m [36mvirginica[39m
+#&gt; n [90mint[39m [31m50[39m [33m50[39m [36m50[39m
+```
+]
 ---
-# How do we actually install and use our package?
+### How do we actually install and use our package?
 
 + To actually install your package, you use the `devtools::install()` function which installs your R package into your R system library.
 
+--
 + Then you can load your package with:
 
 ```r
@@ -537,39 +498,20 @@ library('mypkg')
 ```
 
 --
-
 + Before installing you should check that all the moving parts of your package will work using `devtools::check()`.
 
+--
 + **Read the output of the check!** Deal with problems early and often. 
-
 + It’s just like incremental development of .R and .Rmd files. The longer you go between full checks that everything works, the harder it becomes to pinpoint and solve your problems.
 
 ---
 class: center, middle, inverse, title-slide
 # ggbrookings
+.xlarge[A ggplot2 extension package which implements the Brookings style guide. It offers several color palettes, a custom theme, and a few helper functions.]
 
 ---
 
-# Overview
-
-`ggbrookings` is a `ggplot2` extension which implements the Brookings style guide. It offers several color palettes, a custom theme, and a few helper functions.
-
-
-.pull-left[Make sure you have `devtools` installed. 
-
-If you're using a Windows computer you will also need to install `RTools`.]
-
-
-.pull-right[
-
-
-```r
-devtools::install_github("BrookingsInstitution/ggbrookings")
-```
-
-]
----
-# Setup
+## Setup
 ### Installation
 
 Make sure you have `devtools` installed. If you're using a Windows computer you will also need to install `RTools`.
@@ -578,6 +520,8 @@ Make sure you have `devtools` installed. If you're using a Windows computer you 
 ```r
 devtools::install_github("BrookingsInstitution/ggbrookings")
 ```
+
+--
 
 ### Fonts
 
@@ -595,29 +539,356 @@ ggbrookings::import_roboto()
 
 ---
 
-# Usage
+## Usage
 
 Currently, the ggbrookings package only has a few simple user facing functions:
 
 --
-
 + `theme_brookings()` overrides the default ggplot2 theme for a custom one which adheres to the Brookings style guide.
 
 --
-
 + `scale_color_brookings() `and `scale_fill_brookings()` provide several color palettes that are consistent with the Brookings brand and designed to provide color accessiblity.
 
 --
-
 + `brookings_view_palette()` is a helper function to see the colors from each palette and extract their hex codes.
 
 --
-
 + `add_logo()` adds a program/center logo to your plots after saving them. See the vignette on adding logos for more details.
 
 ---
 
-# Examples
+## Brookings Theme 
+
+`theme_brookings()` provides a ggplot2 theme formatted according to the Brookings style guide
+.left-code[
+
+```r
+ggplot(data = penguins,
+       aes(x = bill_length_mm,
+           y = bill_depth_mm,
+           group = species,
+           color = species,
+           shape = species)) +
+  geom_point()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/plot-last-1.png)
+]
+---
+
+## Brookings Theme
+
+You can call `theme_brookings()` while creating your plot 
+.left-code[
+
+```r
+ggplot(data = penguins,
+       aes(x = bill_length_mm,
+           y = bill_depth_mm,
+           group = species,
+           color = species,
+           shape = species)) +
+  geom_point() +
+* theme_brookings() 
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-theme-1.png)
+]
+
+---
+
+
+## Brookings Theme
+
+Or set it as the default theme in your session with `theme_set(theme_brookings())`
+.left-code[
+
+```r
+*theme_set(theme_brookings())
+
+ggplot(data = penguins,
+       aes(x = bill_length_mm,
+           y = bill_depth_mm,
+           group = species,
+           color = species,
+           shape = species)) +
+  geom_point() 
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-theme-set-1.png)
+]
+
+
+
+
+---
+
+
+## Brookings Theme
+.left-long-code[
+
+```r
+p &lt;- ggplot(data = penguins,
+           aes(x = bill_length_mm,
+               y = bill_depth_mm,
+               group = species,
+               color = species,
+               shape = species)) +
+      geom_point() +
+*     labs(title = "Penguin bill dimensions",
+*      subtitle = "Bill length and depth for Adelie, Chinstrap and Gentoo Penguins at Palmer Station LTER",
+*      caption = '**Source:** Palmer Penguins',
+*      tag = 'FIGURE 1',
+*      x = "Bill length (mm)",
+*      y = "Bill depth (mm)")
+
+p
+```
+]
+
+
+.right-narrow-plot[
+![](index_files/figure-html/brookings-theme-title-1.png)
+]
+
+---
+
+
+## Scales
+
+`ggbrookings` offers 20  color scales that you can map to your color and fill aesthetics
+
+.left-code[
+
+```r
+p +
+  scale_color_brookings()
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-main-1.png)
+]
+
+---
+
+## Scales
+
+
+.left-code[
+
+```r
+p +
+  scale_color_brookings('brand2')
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-brand2-1.png)
+]
+
+---
+
+## Scales
+
+
+.left-code[
+
+```r
+p +
+  scale_color_brookings('semantic2')
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-semantic2-1.png)
+]
+
+---
+
+## Scales
+
+
+.left-code[
+
+```r
+p +
+  scale_color_brookings('categorical')
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-categorical-1.png)
+]
+
+---
+
+
+## Scales
+
+
+.left-code[
+
+```r
+p +
+  scale_color_brookings('misc')
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-misc-1.png)
+]
+
+---
+
+## View Palette
+
+You can check out all the colors for each palette by running `brookings_view_palette('name_of_palette')`
+
+--
+.left-code[
+
+```r
+brookings_view_palette('brand1')
+```
+
+```
+#&gt; [1] "c(#FF9E1B, #8AC6FF, #003A79)"
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-view-brand1-1.png)
+]
+
+---
+
+## View Palette
+.left-code[
+
+```r
+brookings_view_palette('brand2')
+```
+
+```
+#&gt; [1] "c(#D0D3D4, #FF9E1B, #003A79)"
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-view-brand2-1.png)
+]
+
+---
+
+## View Palette
+.left-code[
+
+```r
+brookings_view_palette('semantic2')
+```
+
+```
+#&gt; [1] "c(#E0BB00, #A00D11, #1C8090)"
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-view-semantic2-1.png)
+]
+
+---
+
+## View Palette
+.left-code[
+
+```r
+brookings_view_palette('categorical')
+```
+
+```
+#&gt; [1] "c(#9e0d12ff, #de60a1ff, #f5cc05ff, #fd9d1fff, #00649fff, #2599adff)"
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-view-categorical-1.png)
+]
+
+---
+
+## View Palette
+.left-code[
+
+```r
+brookings_view_palette('misc')
+```
+
+```
+#&gt; [1] "c(#F5CC00, #3EB2C6, #003A79)"
+```
+]
+
+.right-plot[
+![](index_files/figure-html/brookings-view-misc-1.png)
+]
+
+--
+.xlarge[More examples and information about the palettes can be found in the [Brookings Palettes Vignette](https://brookingsinstitution.github.io/ggbrookings/articles/palettes.html)]
+---
+
+## Add logo
+
+
+In order to add a logo you should create your plot, save it, and then use `add_logo()`.
+The function takes on six arguments:
+
+-   `plot_path`: file path for the plot
+-   `logo_path`: which logo to use ('brookings' by default)
+-   `logo_position`: 
+    Can be 'top left', 'top right', 'bottom left', and 'bottom right'.
+-   `logo_scale`: 
+    The portion of the plot width the logo should occupy.
+-   `height_padding`: 
+    Control the y axis position of a logo by specifying the padding proportion.
+-   `width_padding`: 
+    Control the x axis position of a logo by specifying the padding proportion.
+    
+.xlarge[Offers 22 center/program logos. Learn more from the [Adding logos vignette](https://brookingsinstitution.github.io/ggbrookings/articles/logos.html)]
+
+---
+## Add Logo
+.left-long-code[
+
+
+```r
+# Plot your chart in R
+p + scale_color_brookings() 
+# Save it to an image
+ggsave("images/penguins.png",  dpi=300, height=5, width=6, units="in", bg = 'white')
+
+# Create image object with a logo
+penguins_plot &lt;- 
+  add_logo(plot_path = 'images/penguins.png', 
+           logo_path = 'brookings',
+           logo_scale = 5,
+           logo_position = 'bottom right')
+# Save it!
+image_write(penguins_plot, "images/penguins_logo.png")
+```
+]
+
+
+.right-narrow-plot[
+&lt;img src="images/penguins_logo.png" style="display: block; margin: auto;" /&gt;
+]
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
@@ -626,7 +897,8 @@ Currently, the ggbrookings package only has a few simple user facing functions:
 "ratio": "16:9",
 "highlightStyle": "github",
 "highlightLines": true,
-"countIncrementalSlides": false
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));

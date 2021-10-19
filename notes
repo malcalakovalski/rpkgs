@@ -1,0 +1,21 @@
+What I'm going to try to do today is try to convince you that building R packages is accessible and quite useful.
+
+
+ A package has a few components:
+
+Description: When you google a package and you see the CRAN page with the name, description, author, version etc that all comes from the Description file.
+
+Namespace: Slightly trickier. Essentially a machine readable description of the environment for R. So it knows what functions exist in your environment, what functions to import from other envrionments, and what to export. Not going to build them ourselves.
+
+Help file: Text describing functions.
+
+# Dependencies
+
+Idea that your R package might use functions from another package (perfeclty normal).
+
+For example, in your first local R package you use a whole lot of dplyr to prepare the data. You need to indicate that your package requires dplyr, otherwise it won't work. If people install it your package should ensure that they have dplyr installed.
+
+Description file has a number of tags which are used to write the NAMESPACE:
+
+Imports:
+Suggest: Takes a while to get around the difference but the idea is that vignette requirements should go here. You don't need to build the vignettes to use the package so it's not strictly necessary.
