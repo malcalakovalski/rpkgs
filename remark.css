@@ -229,11 +229,19 @@ pre {
 }
 
 .title-slide {
-  background-image: url("../images/dn.svg");
+  background-image: url("../images/dn.jpg");
   background-repeat: no-repeat;
   background-position: 96% 5%;
-  background-size: auto 72px;
-  background-color: #f2f1f6;
+  background-size: auto 172px;
+  background-color: #FAFAFA;
+}
+
+.title-slide-ggbrookings {
+  background-image: url("../images/ggbrookings-logo.png");
+  background-repeat: no-repeat;
+  background-position: 96% 5%;
+  background-size: auto 172px;
+  background-color: #FAFAFA;
 }
 
 .title-slide h1 {
