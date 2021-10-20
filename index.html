@@ -52,7 +52,7 @@ Writing a package can seem overwhelming at first. So we'll cover the basics to g
 
 Even though I use R all the time, I'm relatively new to package development. It seemed really intimidating and complicated. 
 
-One of the reasons I finally decided to power through and learn how to create one is that I was reusing a lot of code to create charts that looked nice on the Brookings website. So I decided to make a package to easily summon my custom themes and color palettes. 
+I finally decided to power through and learn how to create bc I was rewriting similar functions across projects and wanted to make my life easier. 
 
 My goal today is to walk you through enough of the basics to get you started and to convince you that you absolutely can make one
 
@@ -622,13 +622,18 @@ usethis::use_data(my_data, overwrite = TRUE)
 ```
 
 ]
+---
+class: middle, center
 
+# Questions?
 
 ---
 class: center, middle, inverse, title-slide-ggbrookings
 # ggbrookings
 .xlarge[A ggplot2 extension package which implements the Brookings style guide. It offers several color palettes, a custom theme, and a few helper functions.]
 
+???
+Motivation: I was reusing a lot of code to create charts that looked nice on the Brookings website. So I decided to make a package to easily summon my custom themes and color palettes. Eventually I thought it could save other people time as well so I tried replicating the Brookings style guide as faithfully as possible and wrote thorough documentation. 
 ---
 
 ## Setup
