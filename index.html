@@ -68,11 +68,13 @@ class: highlight-last-item
 In other words, a **package** is a home for *functions*.
 
 --
+
 And **functions** are a home for *source code*. 
 ???
 I.e., functions in R are short-hand for longer source code. 
 
 --
+
 
 Packages are a way of **describing** and **distributing** these functions, in a structured and consistent way.
 
@@ -297,6 +299,9 @@ __Beware of tidyverse dependencies!__  Hadley's Wickham's advice:
 
 ```r
 usethis::use_r("my_mean")
+##✓ Setting active project to '/Users/malcalakovalski/mypkg'
+##• Modify 'R/fcount.R'
+##• Call `use_test()` to create a matching test file
 ```
 ]
 
@@ -332,8 +337,6 @@ my_mean &lt;- function(x) {
 + Creates a new code file for you to write your function.
 + Places file in the `R` folder
 + New file is entirely blank
-&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
-🛑 For *EVERY* __non-base__ R function you need to use `::` to reference the function. 
 ]
 ---
 ## Functions
