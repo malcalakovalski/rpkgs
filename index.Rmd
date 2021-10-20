@@ -8,7 +8,7 @@ output:
     css: ["remark.css",  "my-theme.css", xaringan-themer.css]
     nature:
       ratio: 16:9
-      highlightStyle: github
+      highlightStyle: dracula
       highlightLines: true
       countIncrementalSlides: false
       slideNumberFormat: "%current%"
@@ -73,40 +73,42 @@ knitr::read_chunk('plots.R')
 
 Writing a package can seem overwhelming at first. So we'll cover the basics to get you started:
 
---
 + What is an R package and why you might want to build one
-
---
-+ Functions
-
---
 + Basic package structures and concepts
-
---
-+ Documentation
-
---
-+ Dependencies
-
---
-+ Build and check
-
---
 + `ggbrookings` walkthrough
+
+???
+
+Even though I use R all the time, I'm relatively new to package development. It seemed really intimidating and complicated. 
+
+One of the reasons I finally decided to power through and learn how to create one is that I was reusing a lot of code to create charts that looked nice on the Brookings website. So I decided to make a package to easily summon my custom themes and color palettes. 
+
+My goal today is to walk you through enough of the basics to get you started and to convince you that you absolutely can make one
 
 ---
 class: highlight-last-item
 
 ## R packages 
-In R, the fundamental unit of shareable code is the package. 
+> Packages are the fundamental units of reproducible R code. They include reusable R functions, the documentation that describes how to use them, and sample data.  
+> - [Hadley Wickham and Jenny Bryan](https://r-pkgs.org/index.html)
 
-+ What are they?
-    + Collections of functions bundled with data, documentation, and tests
-    + Purpose is up to the author
+
+
+In other words, a **package** is a home for *functions*.
+
+--
+And **functions** are a home for *source code*. 
+???
+I.e., functions in R are short-hand for longer source code. 
 
 --
 
+Packages are a way of **describing** and **distributing** these functions, in a structured and consistent way.
 
+
+
+---
+## R packages
 
 You may already know how to:
 
@@ -114,7 +116,8 @@ You may already know how to:
 ```{r, eval=F}
 install.packages("x")
 ```
-
+???
+If you use R you're probably familiar with how to install and load packages from CRAN and access their documentation
 --
 
 - Use them in R
@@ -134,22 +137,62 @@ help(package = "x")
 ## Why write a package?
 
 + Code Organization: 
-  + I am always trying to figure out where that “function” I wrote months, weeks, or even days ago. Often times, I end up just re-writing it because it is faster than searching all my .R files. An R package would help in organizing where my functions go.
-+ Consistent documentation: 
-  + I can barely remember what half of my functions do let alone the inputs and outputs. 
-  + An R package provides a great consistent documentation structure and actually encourages you to document your functions.
-+ Code Distribution: 
-  + No more emailing .R scripts! 
-  + An R package gives an easy way to distribute your code for others. Especially if you put it on GitHub.
 
 ???
-these should be notes
+Code organization:  I am always trying to figure out where I saved that “function” I wrote months, weeks, or even days ago. Often times, I end up just re-writing it because it is faster than searching all my .R files. An R package would help in organizing where my functions go.
+--
++ Consistent documentation: 
+???
+Documentation: I can barely remember what half of my functions do let alone the inputs and outputs. An R package provides a great way to write consistent documentation
+--
+
++ Code Distribution: 
+???
+Documentation: I can barely remember what half of my functions do let alone the inputs and outputs. An R package provides a great way to write consistent documentation
+
+--
+
++ __Anything__ you do repeatedly and want to automate
+
+> As Hilary Parker says in her [introduction to packages](https://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/): “Seriously, it doesn’t have to be about sharing your code (although that is an added benefit!). It is about saving yourself **time**.”
+
+
+---
+## Why write a package?
+
++ Take project-specific input data and clean in a consistent way
++ Create a specific plot/table with your colors, logo, and specific data
++ Generate a recurring report
+
 ---
 
 ## Setup
 
- We will be using these packages to make our lives easier:
-```{r, eval=F}
+We will be using these packages to make our lives easier:
+
+
+* [`devtools`](https://devtools.r-lib.org/):  
+
+> The aim of devtools is to make package development easier by providing R functions that simplify and expedite common tasks.
+
+???
+While creating a package can seem intimidating, the tidyverse team has spent years crafting meta-packages to make life easier to create packages. 
+
+These are used everyday by 1000s of package developers, and really do make the complicated things easier... with functions!
+
+--
+
+* [`usethis`](https://usethis.r-lib.org/)  
+
+> usethis is a workflow package: it automates repetitive tasks that arise during project setup and development, both for R packages and non-package projects.
+
+--
+
+* [`roxygen2`](https://roxygen2.r-lib.org)
+
+> The premise of roxygen2 is simple: describe your functions in comments next to their definitions and roxygen2 will process your source code and comments to produce Rd files in the man/ directory
+
+```{r, eval=F, include = FALSE}
 install.packages(c("devtools", # expedite common tasks to simplify package dev
                    "usethis",  # workflow package to automate repetitive tasks
                    "roxygen2"  # Easier documentation
@@ -157,36 +200,25 @@ install.packages(c("devtools", # expedite common tasks to simplify package dev
 ```
 
 
+
+
+
+
 ---
 ## Lets build a package! 
 
-.xlarge[.pull-left[
-You can setup a bare bones package by running:
+.large[.pull-left[
+You can setup a bare bones package by running `usethis::create_package('mypkg')` or from the RStudio menu
 
-```{r}
-usethis::create_package("mypkg")
-```
+
 ]]
 
 .pull-right[
-<img src="images/basic-pkg-structure.png">
+![A gif of using the RStudio IDE to create a new blank package.](images/rstudio-create-pkg.gif)
 ]
 
 ---
-
-## Lets build a package! 
-
-.xlarge[.pull-left[
-Or clicking __File > New Project... > New Directory > R package__
-]]
-
-.pull-right[
-<img src="images/new-pkg.png">
-]
-
----
-
-## Package Structure: Requirements
+## What's in a package?
 
 .xlarge[.left-column[
 + **_Description_** 
@@ -194,7 +226,7 @@ Or clicking __File > New Project... > New Directory > R package__
 
 .right-column[
 <br>
-A file with metadata about the package, authors, and dependencies.
+A file with metadata about the package, authors, version, and dependencies.
 ```
 Package: mypkg
 Title: What the Package Does (One Line, Title Case)
@@ -214,9 +246,12 @@ RoxygenNote: 7.1.2
 ```
 ]
 
+???
+
+We'll talk more about dependencies soon
 
 ---
-## Package Structure: Requirements
+## What's in a package?
 
 .xlarge[.left-column[
 + Description
@@ -224,8 +259,7 @@ RoxygenNote: 7.1.2
 ]]
 
 .right-column[
-<br><br><br>
-+ A short-hand file so R can understand what functions and dependencies to import.
+<br><br>
 + Lists functions that will be exported by your package
 + Lists functions imported from other packages
 + `{roxygen2}` will take care of this for you!
@@ -241,7 +275,7 @@ importFrom(magrittr,"%>%")
 ```
 ]
 ---
-## Package Structure: Requirements
+## What's in a package?
 
 .xlarge[.left-column[
 + Description
@@ -250,44 +284,55 @@ importFrom(magrittr,"%>%")
 ]]
 
 .right-column[
-<br>
-+ Your functions go here!
-+ Often you'll see one code file for each exported function.
-+ You can include more than one function in your .R file.
-+ I recommend keeping related functions together.
-  
+<br><br><br><br>
++ .xlarge[Your functions go here!]
 ]
+
+???
+Most important, where you'll spend most time.
+Often you'll see one code file for each exported function.
+You should know that this is just a convention and that you can include more than one function in your .R file.
+
+Personally, I recommend keeping related functions together.
 ---
 
 ## Dependencies 
 
 Usually your package will depend on other packages. You need to convey this so that they are installed. 
+
+???
+For your package to work on someone else's computer it'll have to ensure they have all the necessary functions your package relies on.
 --
 
 + Description file specifies:
   + `Imports` - List of packages ___required___ to use your code (these are also added to NAMESPACE).
   + `Suggests` - Packages that are ___not required___ but help (e.g. functions used in a vignette). Not necessary with a local file. 
   
+???
+There are two types but usually you'll care about your imports.
+  
 --
 
 
 __Beware of tidyverse dependencies!__  Hadley's Wickham's advice:  
 >Because the tidyverse is a set of packages designed for interactive data analysis, this is, in short, a bad idea. The tidyverse package includes a substantial number of direct and indirect dependencies (79 packages, as of this writing), many of which are likely unnecessary for the purposes of your package. Furthermore, the CRAN maintainers frown upon depending on it, which can cause hassle for you down the line.
+
+
 ---
 
 ## Functions
 
 .pull-left[
-Lets create a wrapper function around `mean` which ommits NA's by default.
+
 ```{r, eval=F}
 usethis::use_r("my_mean")
 ```
 ]
 
 .pull-right[
-+ Creates a new code file for you to write your function.
++ Creates a minimal .R file for you to write your function.
 + Places file in the `R` folder
-+ New file is entirely blank
++ Opens it for interactive editing
 ]
 
 ---
@@ -297,12 +342,15 @@ usethis::use_r("my_mean")
 Lets create a wrapper function around `mean` which ommits NA's by default.
 ```{r, eval=F}
 usethis::use_r("my_mean")
+##✓ Setting active project to '/Users/malcalakovalski/mypkg'
+##• Modify 'R/fcount.R'
+##• Call `use_test()` to create a matching test file
 ```
 <br>
 Write the body of our function:
 ```{r}
 my_mean <- function(x) {
-  mean(na.omit(x))
+  mean(na.omit(x)) #<<
 }
 ```
 ]
@@ -311,19 +359,35 @@ my_mean <- function(x) {
 + Creates a new code file for you to write your function.
 + Places file in the `R` folder
 + New file is entirely blank
-<br><br>
-`r emo::ji('stop')` For *EVERY* __non-base__ R function you need to use `::` to reference the function. 
+<br><br><br><br>
+🛑 For *EVERY* __non-base__ R function you need to use `::` to reference the function. 
 ]
---
-
+---
+## Functions
 
 .pull-left[
+Lets create a wrapper function around `mean` which ommits NA's by default.
+```{r, eval=F}
+usethis::use_r("my_mean")
+##✓ Setting active project to '/Users/malcalakovalski/mypkg'
+##• Modify 'R/fcount.R'
+##• Call `use_test()` to create a matching test file
+```
+<br>
 Since `na.omit()` is from the `stats` package, our function should be written as
 ```{r}
 my_mean <- function(x) {
  {{ mean(stats::na.omit(x)) }}
 }
 ```
+]
+
+.pull-right[
++ Creates a new code file for you to write your function.
++ Places file in the `R` folder
++ New file is entirely blank
+<br><br><br><br>
+🛑 For *EVERY* __non-base__ R function you need to use `::` to reference the function. 
 ]
 
 
@@ -337,6 +401,8 @@ Lets add another function that produces a __sorted__ frequency table for a facto
 
 ```{r}
 usethis::use_package("forcats")
+## ✓ Adding 'forcats' to Imports field in DESCRIPTION
+## • Refer to functions with `forcats::fun()`
 ```
 
 --
@@ -349,7 +415,7 @@ usethis::use_r("fcount")
 + Write the body of the function
 ```{r}
 fcount <- function(x) {
-  forcats::fct_count(x, sort = TRUE)
+  forcats::fct_count(x, sort = TRUE) #<<
 }
 ```
 
@@ -359,25 +425,52 @@ fcount <- function(x) {
 ---
 ## Documentation
 
-The premise of `roxygen2` is to describe your functions in comments next to their definitions and `roxygen2` will process your source code and comments to create `.Rd` files in the `man/` directory
-
---
-+ Roxygen comments appear above a function
-
---
-+ They always start with `#'`
-
---
-+ Most common tags are:
-  + `@param` documents function arguments
-  + `@export` tells roxygen to export the function when the package is built
---
 
 .pull-left[ Insert a roxygen2 skeleton by placing your cursor inside the function body and either: 
   + Pressing `Ctrl + Alt + Shift + R`  
   + Clicking `Code > Insert roxygen skeleton`.]
   
 .pull-right[
+  ```{r}
+#' Title
+#'
+#' @param x 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fcount <- function(x) {
+  forcats::fct_count(x, sort = TRUE)
+}
+```
+]
+
+--
+
+
++ Roxygen comments appear above a function
+
+--
++ Roxygen items are indicated with special comments (#'), ie:
+
+--
++ Most common tags are:
+  + `@param` documents function arguments
+  + `@export` tells roxygen to export the function when the package is built
+  + `@return` what the function return
+---
+
+## Documentation
+
+
+.pull-left[ Insert a roxygen2 skeleton by placing your cursor inside the function body and either: 
+  + Pressing `Ctrl + Alt + Shift + R`  
+  + Clicking `Code > Insert roxygen skeleton`.]
+  
+.pull-right[
+
+.xlarge[**Fill in the template!**]
   ```{r}
 #' Make a sorted frequency table for a factor
 #'
@@ -393,6 +486,13 @@ fcount <- function(x) {
 ```
 ]
 
+
+
++ Roxygen comments appear above a function
++ They always start with `#'`
++ Most common tags are:
+  + `@param` documents function arguments
+  + `@export` tells roxygen to export the function when the package is built
 ---
 
 ## Documentation
@@ -415,6 +515,7 @@ And preview it with
 
 <img src="images/fcount-documentation.png">
 ]
+
 --
 
 + This did a lot of work for us!
@@ -422,6 +523,76 @@ And preview it with
   + The `NAMESPACE` now specifies that the package will export the `fcount` function. 
 
 ---
+
+## Using our package
+
+```{r, echo = FALSE, eval=TRUE, message=FALSE}
+fcount <- function(x) {
+  forcats::fct_count(x, sort = TRUE)
+}
+
+iris <- as_tibble(datasets::iris)
+```
++ How do we test drive `fcount()`? 
+  + If this were a regular R script, we might define `fcount()` in the global workspace by running it outrselves or calling `source("R/fcount.R")`.
+
+--
++ `devtools::load_all()` to the rescue!
+  + Places your functions and package in local memory so that you may tinker and confirm its execution
+
+--
+  + Basically the equivalent of sourcing all the scripts in your `R/` folder and loading all your data.
+  
+--
+  + Allows you to iterate quickly, which encourages exploration and incremental progress.
+
+--
++ However as soon as you close your R session, the package will no longer be available.
+
+--
+
+Let's test our function!
+```{r, eval = TRUE}
+#devtools::load_all()
+fcount(iris$Species)
+```
+---
+
+## Checking our package
+
+> We have empirical evidence that our function works. But how can we be sure that all the moving parts of the this new package still work? This may seem silly to check, after such a small addition, but it’s good to establish the habit of checking this often.
+--
+
+
+We can do this with the `check()` function.
+
+--
+
+> `check` automatically builds and checks a source package, using all known best practices
+```{r, eval = FALSE}
+devtools::check()
+```
+
+--
++ **Read the output of the check!** Deal with problems early and often. 
++ It’s just like incremental development of .R and .Rmd files. The longer you go between full checks that everything works, the harder it becomes to pinpoint and solve your problems.
+---
+
+## Installing our package
+
++ We are now ready to install our package `r emo::ji('celebration')`
++ `devtools::install()` will install your package locally when run inside the specific package project.
+
+--
++ Then you can load your package with:
+```{r, eval = F}
+library('mypkg')
+```
+
+--
+To share with your colleagues, you should use GitHub or other version control so they can install with `devtools::install_github('your_name/repository)` 
+---
+
 
 ## Include Datasets
 
@@ -438,10 +609,16 @@ usethis::use_data_raw()
 #>    add data to package
 ```
 ]
+
+???
+Sometimes you might want to include a dataset and the script used to clean it in your package. This makes it easy to share your data and ensure reproducibility. Also, makes it easier to load the same data across projects/scripts without copying and pasting or worrying about file paths.
+
+We're going to start by calling use_data_raw() which sort of like use_r() creates an empty script for us to write the code that cleans our raw data. The end of this file should attach the outputed cleaned data to your package.
+
 --
 .pull-right[
-- Simulate dataset, and `use_data()` will save it with the package
-- Save this script is the `data-raw/` folder
+- Simulate dataset, and then call `use_data()` to save it with the package
+- Save this script in the `data-raw/` folder
 
 ```{r}
 set.seed(8976) # remeber to set your seed!
@@ -457,61 +634,6 @@ usethis::use_data(my_data, overwrite = TRUE)
 
 ]
 
----
-
-## How do we actually install and use our package?
-
-+ How do we test drive `fcount()`? 
-  + If this were a regular R script, we might define fcount() in the global workspace by running it outrselves or calling `source("R/fcount.R")`.
-
---
-+ `devtools::load_all()` to the rescue!
-  + Places your functions and package in local memory so that you may tinker and confirm its execution
-
---
-  + Basically the equivalent of sourcing all the scripts in your `R/` folder and loading all your data.
-  
---
-  + Allows you to iterate quickly, which encourages exploration and incremental progress.
-
---
-+ However as soon as you close your R session, the package will no longer be available.
-
-.left-column[ Lets test our function!]
-
-```{r, echo = FALSE, eval=TRUE, message=FALSE}
-fcount <- function(x) {
-  forcats::fct_count(x, sort = TRUE)
-}
-```
-.right-column[
-
-```{r, include = FALSE}
-iris <- as_tibble(iris)
-```
-
-```{r, message=TRUE, eval=TRUE}
-#devtools::load_all()
-fcount(iris$Species)
-```
-]
----
-### How do we actually install and use our package?
-
-+ To actually install your package, you use the `devtools::install()` function which installs your R package into your R system library.
-
---
-+ Then you can load your package with:
-```{r, eval = F}
-library('mypkg')
-```
-
---
-+ Before installing you should check that all the moving parts of your package will work using `devtools::check()`.
-
---
-+ **Read the output of the check!** Deal with problems early and often. 
-+ It’s just like incremental development of .R and .Rmd files. The longer you go between full checks that everything works, the harder it becomes to pinpoint and solve your problems.
 
 ---
 class: center, middle, inverse, title-slide-ggbrookings
@@ -565,12 +687,14 @@ Currently, the ggbrookings package only has a few simple user facing functions:
 ---
 
 ## Brookings Theme 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = TRUE}
 librarian::shelf(tidyverse, ggbrookings, palmerpenguins)
+
+theme_set(theme_grey())
 ```
 `theme_brookings()` provides a ggplot2 theme formatted according to the Brookings style guide
 .left-code[
-```{r plot-last,  eval = TRUE, fig.show = 'hide', fig.height = 5, fig.width = 6}
+```{r plot-last,  eval = TRUE, fig.show = 'hide', fig.height = 4.8, fig.width = 6}
 
 ggplot(data = penguins,
        aes(x = bill_length_mm,
@@ -578,7 +702,7 @@ ggplot(data = penguins,
            group = species,
            color = species,
            shape = species)) +
-  geom_point()
+  geom_point() 
 ```
 ]
 
@@ -613,6 +737,11 @@ ggplot(data = penguins,
 
 ## Brookings Theme
 
+```{r, include=FALSE, eval = TRUE}
+#theme_set(theme_brookings())
+```
+
+
 Or set it as the default theme in your session with `theme_set(theme_brookings())`
 .left-code[
 ```{r brookings-theme-set,  eval = TRUE, fig.show = 'hide', fig.height = 4.8, fig.width = 6}
@@ -633,9 +762,6 @@ ggplot(data = penguins,
 ![](`r knitr::fig_chunk('brookings-theme-set', 'png')`)
 ]
 
-```{r, include=FALSE, eval = TRUE}
-theme_set(theme_brookings())
-```
 
 
 ---
@@ -727,9 +853,8 @@ p +
 
 .left-code[
 ```{r brookings-categorical,  eval = TRUE, fig.show = 'hide', fig.height = 5, fig.width = 6}
-
-p +
-  scale_color_brookings('categorical')
+p + 
+   scale_color_brookings('categorical')
 ```
 ]
 
@@ -822,6 +947,8 @@ brookings_view_palette('categorical')
 
 brookings_view_palette('misc')
 ```
+
+.large[More examples and information about the palettes can be found in the [Brookings Palettes Vignette](https://brookingsinstitution.github.io/ggbrookings/articles/palettes.html)]
 ]
 
 .right-plot[
@@ -829,7 +956,7 @@ brookings_view_palette('misc')
 ]
 
 --
-.xlarge[More examples and information about the palettes can be found in the [Brookings Palettes Vignette](https://brookingsinstitution.github.io/ggbrookings/articles/palettes.html)]
+
 ---
 
 ## Add logo
@@ -879,4 +1006,40 @@ knitr::include_graphics("images/penguins_logo.png")
 ```
 ]
 
+---
+class: left, middle, inverse
 
+# Visit the [ggbrookings website](https://brookingsinstitution.github.io/ggbrookings/) or browse the [source code](https://github.com/BrookingsInstitution/ggbrookings/) for more detailed documentation!
+
+
+---
+
+## Summary
+
++ What is an R package and why you might want to build one
+
+--
++ Functions
+
+--
++ Documentation
+
+--
++ Dependencies
+
+--
++ Build and check
+
+--
++ Adding data
+
+--
++ `ggbrookings` walkthrough
+
+--
+
+>I hope you feel empowered that you can create your own package, and with many best practices. Ultimately, once you get started you'll quickly see that the tooling has been written to make the process very user friendly.
+
+--
+
+.xlarge[Thank you! `r emo::ji('goodbye')`]
